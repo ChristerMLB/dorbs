@@ -5,6 +5,6 @@
 - Serves **only** `.html`, `.css`, and `.webp` files
 - Files are served **only** from the executable's folder, no subfolders
 
-Security and performance are very much just potential, though, since the whole thing's vibe coded ¯\\\_(ツ)\_/¯
+Security and performance are very much just potential, though, since the whole thing's vibe coded.
 
-So, you know, don't use it.
+So, you know, don't use it  ¯\\\_(ツ)\_/¯
