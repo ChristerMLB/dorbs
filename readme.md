@@ -1,8 +1,10 @@
 # dorbs
 
-**dorbs** (short for "adorable server") is a tiny, vibe-coded web server with strict limitations for security and performance:
+**dorbs** (short for "adorable server") is a tiny web server with strict limitations added for for potential security and performance:
 
 - Serves **only** `.html`, `.css`, and `.webp` files
 - Files are served **only** from the executable's folder, no subfolders
 
-It's simple, potentially secure, and maybe even fast—but don't expect perfection just yet. Enjoy the vibes! ¯\\\_(ツ)\_/¯
+Security and performance are very much just potential, though, since the whole thing's vibe coded ¯\\\_(ツ)\_/¯
+
+So, you know, don't use it.

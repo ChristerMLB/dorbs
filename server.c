@@ -521,11 +521,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("╔══════════════════════════════════════════════════════╗\n");
-    printf("║                     dorbs v0.1                       ║\n");
-    printf("╠══════════════════════════════════════════════════════╣\n");
-    printf("║ Server URL: http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
-    printf("╚══════════════════════════════════════════════════════╝\n");
+    printf("╔════════════════════════════════════════════════════════╗\n");
+    printf("║                     dorbs v0.1                         ║\n");
+    printf("╠════════════════════════════════════════════════════════╣\n");
+    printf("║ Visit with http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
+    printf("╚════════════════════════════════════════════════════════╝\n");
 
     long request_count_for_cleanup = 0;
     while (server_running) {
