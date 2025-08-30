@@ -98,7 +98,7 @@ void send_error(int client_socket, int code, const char *status_msg) {
              "Content-Type: text/plain\r\n"
              "Content-Length: %d\r\n"
              "Connection: close\r\n"
-             "Server: MinimalWebServer/1.1\r\n\r\n"
+             "Server: dorbs/0.2\r\n\r\n"
              "%s",
              code, status_msg, content_len, status_msg);
     
@@ -144,10 +144,8 @@ int is_valid_path(const char *path) {
         }
     }
 
-    if (strlen(decoded_path) <= 1) {
-        return 0;
-    }
-
+    // A single character like "/" is not a valid file path after our rewrite, but it could be requested.
+    // It will result in a 404 which is correct.
     return 1;
 }
 
@@ -218,7 +216,11 @@ const char *get_file_extension(const char *filename) {
 
 int is_allowed_file(const char *filename) {
     const char *ext = get_file_extension(filename);
-    return (strcmp(ext, ".html") == 0 || strcmp(ext, ".css") == 0 || strcmp(ext, ".webp") == 0 || strcmp(ext, ".js") == 0);
+    // CHANGED: Added modern asset types (.svg, .woff2) and limited 3D models to .glb
+    return (strcmp(ext, ".html") == 0 || strcmp(ext, ".css") == 0 || strcmp(ext, ".js") == 0 ||
+            strcmp(ext, ".webp") == 0 || strcmp(ext, ".svg") == 0 ||
+            strcmp(ext, ".woff2") == 0 ||
+            strcmp(ext, ".glb") == 0);
 }
 
 void cache_all_files() {
@@ -230,19 +232,11 @@ void cache_all_files() {
 
     struct dirent *ent;
     while ((ent = readdir(dir)) != NULL && cache_count < MAX_FILES) {
-        // First, perform cheap check on file extension
         if (!is_allowed_file(ent->d_name)) continue;
 
         struct stat file_info;
-        if (stat(ent->d_name, &file_info) != 0) {
-            continue;
-        }
-
-        // This ensures we only cache regular files and is portable across all POSIX systems.
-        if (!S_ISREG(file_info.st_mode)) {
-            continue;
-        }
-        
+        if (stat(ent->d_name, &file_info) != 0) continue;
+        if (!S_ISREG(file_info.st_mode)) continue;
         if (file_info.st_size > MAX_FILE_SIZE || file_info.st_size == 0) continue;
 
         if (total_cache_memory + file_info.st_size > MAX_TOTAL_CACHE_MEMORY) {
@@ -268,8 +262,6 @@ void cache_all_files() {
         fclose(file);
 
         caches[cache_count].data = file_data;
-        // CHANGED: Replaced strncpy with snprintf to prevent compiler warnings (-Wstringop-truncation)
-        // and ensure guaranteed null-termination in a safer, more modern way.
         snprintf(caches[cache_count].name, sizeof(caches[cache_count].name), "%s", ent->d_name);
         caches[cache_count].size = file_info.st_size;
         caches[cache_count].last_access = time(NULL);
@@ -383,14 +375,16 @@ void handle_client(ClientRequest *request) {
     }
     pthread_rwlock_unlock(&cache_rwlock);
 
-
     const char *ext = get_file_extension(file_to_serve->name);
-    const char *content_type = "text/plain";
-    if (strcmp(ext, ".css") == 0) content_type = "text/css";
-    else if (strcmp(ext, ".webp") == 0) content_type = "image/webp";
-    else if (strcmp(ext, ".html") == 0) content_type = "text/html";
-    // CHANGED: Added content type for JavaScript files.
+    const char *content_type = "application/octet-stream";
+    if (strcmp(ext, ".html") == 0) content_type = "text/html";
+    else if (strcmp(ext, ".css") == 0) content_type = "text/css";
     else if (strcmp(ext, ".js") == 0) content_type = "application/javascript";
+    else if (strcmp(ext, ".webp") == 0) content_type = "image/webp";
+    // CHANGED: Added new content types
+    else if (strcmp(ext, ".svg") == 0) content_type = "image/svg+xml";
+    else if (strcmp(ext, ".woff2") == 0) content_type = "font/woff2";
+    else if (strcmp(ext, ".glb") == 0) content_type = "model/gltf-binary";
 
     char header[BUFFER_SIZE];
     int header_len = snprintf(header, sizeof(header),
@@ -402,7 +396,7 @@ void handle_client(ClientRequest *request) {
                               "X-Content-Type-Options: nosniff\r\n"
                               "X-Frame-Options: DENY\r\n"
                               "Content-Security-Policy: default-src 'self';\r\n"
-                              "Server: dorbs/0.2\r\n\r\n",
+                              "Server: dorbs/0.2\r\n\r\n", // CHANGED: Name and version
                               content_type, file_to_serve->size);
 
     if (header_len > 0 && (size_t)header_len < sizeof(header)) {
@@ -418,7 +412,7 @@ void handle_client(ClientRequest *request) {
 }
 
 void *thread_worker(void *arg) {
-    (void)arg; // Silence unused parameter warning
+    (void)arg;
     while (server_running) {
         pthread_mutex_lock(&queue_mutex);
         while (queue_count == 0 && server_running) {
@@ -442,11 +436,14 @@ void *thread_worker(void *arg) {
 }
 
 void shutdown_server(int signo) {
-    (void)signo; // Silence unused parameter warning
-    server_running = 0;
-    shutdown(0, SHUT_RD);
-    pthread_cond_broadcast(&queue_not_empty);
-    pthread_cond_broadcast(&queue_not_full);
+    (void)signo;
+    if (server_running) {
+        log_message("INFO", "Shutdown signal received. Shutting down...");
+        server_running = 0;
+        shutdown(0, SHUT_RD); // A trick to unblock accept()
+        pthread_cond_broadcast(&queue_not_empty);
+        pthread_cond_broadcast(&queue_not_full);
+    }
 }
 
 void free_cache_data() {
@@ -484,11 +481,11 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, shutdown_server);
     signal(SIGPIPE, SIG_IGN);
 
-    log_message("INFO", "Starting dorbs!");
+    log_message("INFO", "Starting dorbs server...");
     
     cache_all_files();
     if (cache_count == 0) {
-        log_message("ERROR", "No allowed files (.html, .css, .webp, .js) found to serve. Exiting...");
+        log_message("ERROR", "No allowed files found to serve. Server needs at least one file to start.");
         return EXIT_FAILURE;
     }
 
@@ -530,10 +527,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // CHANGED: Updated server name and version in the startup banner
     printf("╔══════════════════════════════════════════════════════╗\n");
-    printf("║                     dorbs v0.2                       ║\n");
+    printf("║                      dorbs v0.2                      ║\n");
     printf("╠══════════════════════════════════════════════════════╣\n");
-    printf("║ Visit at http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
+    printf("║ Server URL: http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
     printf("╚══════════════════════════════════════════════════════╝\n");
 
     long request_count_for_cleanup = 0;
@@ -568,8 +566,6 @@ int main(int argc, char *argv[]) {
         pthread_cond_signal(&queue_not_empty);
         pthread_mutex_unlock(&queue_mutex);
     }
-
-    log_message("INFO", "Shutting down server...");
     
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         pthread_join(thread_pool[i], NULL);
