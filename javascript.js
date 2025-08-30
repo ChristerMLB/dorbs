@@ -1,4 +1,5 @@
 import * as THREE from "./three.module.min.js";
+import { GLTFLoader } from "./GLTFLoader.js"
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -13,18 +14,27 @@ renderer.setSize(600, 400);
 renderer.setClearColor(0x000000, 0);
 document.getElementById("threedee").appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0xca1800 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+camera.position.z = 2.5;
 
-camera.position.z = 2;
+const light = new THREE.DirectionalLight(0xca1800, 1);
+light.position.set(1, 1, 2).normalize();
+scene.add(light);
+
+const loader = new GLTFLoader();
+let model;
+
+loader.load('./suzanne.glb', (gltf) => {
+  model = gltf.scene;
+  model.scale.set(1, 1, 1);
+  scene.add(model);
+});
 
 function animate() {
   requestAnimationFrame(animate);
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  if (model) {
+    model.rotation.y += 0.01; // spin around Y axis
+  }
 
   renderer.render(scene, camera);
 }
