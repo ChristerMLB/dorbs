@@ -1,4 +1,4 @@
-# Makefile for the Minimal C Web Server
+# Makefile for dorbs
 
 # Compiler to use
 CC = gcc

@@ -528,11 +528,11 @@ int main(int argc, char *argv[]) {
     }
 
     // CHANGED: Updated server name and version in the startup banner
-    printf("╔══════════════════════════════════════════════════════╗\n");
-    printf("║                      dorbs v0.2                      ║\n");
-    printf("╠══════════════════════════════════════════════════════╣\n");
-    printf("║ Server URL: http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
-    printf("╚══════════════════════════════════════════════════════╝\n");
+    printf("╔════════════════════════════════════════════════════════╗\n");
+    printf("║                     dorbs v0.2 (◕‿◕✿)                  ║\n");
+    printf("╠════════════════════════════════════════════════════════╣\n");
+    printf("║ Served at: http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
+    printf("╚════════════════════════════════════════════════════════╝\n");
 
     long request_count_for_cleanup = 0;
     while (server_running) {

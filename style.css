@@ -1,41 +1,54 @@
-        :root {
-            color-scheme: dark;
-        }
-        body {
-            background: #18181b;
-            color: #e5e7eb;
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: #23232a;
-            margin: 5rem auto 0 auto;
-            padding: 2rem 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            text-align: center;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        p {
-            font-size: 1.2rem;
-            margin-top: 0;
-            opacity: 0.8;
-        }
-        a {
-            color: #38bdf8;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        a:hover {
-            color: #0ea5e9;
-        }
+@font-face {
+  font-family: "sono";
+  src:
+    local("Sono"),
+    url("sono.woff2") format("woff2");
+}
+
+:root {
+    color-scheme: dark;
+}
+body {
+    background: navy;
+    color: #ca1800;
+    font-family: 'sono', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.container {
+    background:wheat;
+    margin: 5rem auto 0 auto;
+    padding: 2rem 3rem;
+    border: 2px dotted navy;
+    box-shadow: 0 4px 24px rgba(255,255,255,0.4);
+    text-align: center;
+}
+#threedee{
+    width: 600px;
+    height: 400px;
+    margin: 0 auto;
+}
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-variation-settings: "monospace" 0;
+}
+p {
+    font-size: 1.2rem;
+    margin-top: 0;
+    opacity: 0.8;
+}
+a {
+    color: #38bdf8;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #0ea5e9;
+}
