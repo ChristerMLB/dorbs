@@ -98,7 +98,7 @@ void send_error(int client_socket, int code, const char *status_msg) {
              "Content-Type: text/plain\r\n"
              "Content-Length: %d\r\n"
              "Connection: close\r\n"
-             "Server: dorbs/0.1\r\n\r\n"
+             "Server: MinimalWebServer/1.1\r\n\r\n"
              "%s",
              code, status_msg, content_len, status_msg);
     
@@ -218,7 +218,7 @@ const char *get_file_extension(const char *filename) {
 
 int is_allowed_file(const char *filename) {
     const char *ext = get_file_extension(filename);
-    return (strcmp(ext, ".html") == 0 || strcmp(ext, ".css") == 0 || strcmp(ext, ".webp") == 0);
+    return (strcmp(ext, ".html") == 0 || strcmp(ext, ".css") == 0 || strcmp(ext, ".webp") == 0 || strcmp(ext, ".js") == 0);
 }
 
 void cache_all_files() {
@@ -345,13 +345,20 @@ void handle_client(ClientRequest *request) {
         return;
     }
 
-    if (!is_valid_path(path)) {
+    char final_path[sizeof(path)];
+    if (strcmp(path, "/") == 0) {
+        snprintf(final_path, sizeof(final_path), "/index.html");
+    } else {
+        snprintf(final_path, sizeof(final_path), "%s", path);
+    }
+
+    if (!is_valid_path(final_path)) {
         send_error(request->client_socket, 404, "Not Found");
         return;
     }
 
     char normalized_path[MAX_PATH_LENGTH + 1];
-    url_decode(path + 1, normalized_path, sizeof(normalized_path));
+    url_decode(final_path + 1, normalized_path, sizeof(normalized_path));
 
     pthread_rwlock_rdlock(&cache_rwlock);
     FileCache *file_to_serve = NULL;
@@ -382,6 +389,8 @@ void handle_client(ClientRequest *request) {
     if (strcmp(ext, ".css") == 0) content_type = "text/css";
     else if (strcmp(ext, ".webp") == 0) content_type = "image/webp";
     else if (strcmp(ext, ".html") == 0) content_type = "text/html";
+    // CHANGED: Added content type for JavaScript files.
+    else if (strcmp(ext, ".js") == 0) content_type = "application/javascript";
 
     char header[BUFFER_SIZE];
     int header_len = snprintf(header, sizeof(header),
@@ -393,7 +402,7 @@ void handle_client(ClientRequest *request) {
                               "X-Content-Type-Options: nosniff\r\n"
                               "X-Frame-Options: DENY\r\n"
                               "Content-Security-Policy: default-src 'self';\r\n"
-                              "Server: dorbs/0.1\r\n\r\n",
+                              "Server: dorbs/0.2\r\n\r\n",
                               content_type, file_to_serve->size);
 
     if (header_len > 0 && (size_t)header_len < sizeof(header)) {
@@ -475,11 +484,11 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, shutdown_server);
     signal(SIGPIPE, SIG_IGN);
 
-    log_message("INFO", "Starting adorable server");
+    log_message("INFO", "Starting dorbs!");
     
     cache_all_files();
     if (cache_count == 0) {
-        log_message("ERROR", "No allowed files (.html, .css, .webp) found to serve.");
+        log_message("ERROR", "No allowed files (.html, .css, .webp, .js) found to serve. Exiting...");
         return EXIT_FAILURE;
     }
 
@@ -521,11 +530,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("╔════════════════════════════════════════════════════════╗\n");
-    printf("║                     dorbs v0.1                         ║\n");
-    printf("╠════════════════════════════════════════════════════════╣\n");
-    printf("║ Visit with http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
-    printf("╚════════════════════════════════════════════════════════╝\n");
+    printf("╔══════════════════════════════════════════════════════╗\n");
+    printf("║                     dorbs v0.2                       ║\n");
+    printf("╠══════════════════════════════════════════════════════╣\n");
+    printf("║ Visit at http://[::1]:%-5d or http://localhost:%-5d║\n", port, port);
+    printf("╚══════════════════════════════════════════════════════╝\n");
 
     long request_count_for_cleanup = 0;
     while (server_running) {
