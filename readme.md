@@ -21,4 +21,6 @@ All emotes have been grabbed from https://emotes.io/, some have been slightly mo
 
 suzanne.glb is the head of the blender mascot, read more about her and other mesh primitives here: https://docs.blender.org/manual/en/latest/modeling/meshes/primitives.html
 
-"three.module.min.js", "three.core.min.js" and "BufferGeometryUtils.js" have all been grabbed from threejs, a JavaScript 3D library, if you want to use it, you're better off going here: https://github.com/mrdoob/three.js/
+"three.module.min.js", "three.core.min.js", "GLTFLoader.js" and "BufferGeometryUtils.js" have all been grabbed from threejs, a JavaScript 3D library, if you want to use it, you're better off going here: https://github.com/mrdoob/three.js/
+
+"sono.woff2" is the Sono font from Google Fonts, you can find it here: https://fonts.google.com/specimen/Sono
