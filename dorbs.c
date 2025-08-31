@@ -216,11 +216,10 @@ const char *get_file_extension(const char *filename) {
 
 int is_allowed_file(const char *filename) {
     const char *ext = get_file_extension(filename);
-    // CHANGED: Added modern asset types (.svg, .woff2) and limited 3D models to .glb
     return (strcmp(ext, ".html") == 0 || strcmp(ext, ".css") == 0 || strcmp(ext, ".js") == 0 ||
             strcmp(ext, ".webp") == 0 || strcmp(ext, ".svg") == 0 ||
-            strcmp(ext, ".woff2") == 0 ||
-            strcmp(ext, ".glb") == 0);
+            strcmp(ext, ".woff2") == 0 || strcmp(ext, ".ico") == 0 ||
+            strcmp(ext, ".rss") == 0 || strcmp(ext, ".glb") == 0);
 }
 
 void cache_all_files() {
@@ -381,10 +380,11 @@ void handle_client(ClientRequest *request) {
     else if (strcmp(ext, ".css") == 0) content_type = "text/css";
     else if (strcmp(ext, ".js") == 0) content_type = "application/javascript";
     else if (strcmp(ext, ".webp") == 0) content_type = "image/webp";
-    // CHANGED: Added new content types
     else if (strcmp(ext, ".svg") == 0) content_type = "image/svg+xml";
     else if (strcmp(ext, ".woff2") == 0) content_type = "font/woff2";
     else if (strcmp(ext, ".glb") == 0) content_type = "model/gltf-binary";
+    else if (strcmp(ext, ".ico") == 0) content_type = "image/vnd.microsoft.icon";
+    else if (strcmp(ext, ".rss") == 0) content_type = "application/rss+xml";;
 
     char header[BUFFER_SIZE];
     int header_len = snprintf(header, sizeof(header),
@@ -396,7 +396,7 @@ void handle_client(ClientRequest *request) {
                               "X-Content-Type-Options: nosniff\r\n"
                               "X-Frame-Options: DENY\r\n"
                               "Content-Security-Policy: default-src 'self';\r\n"
-                              "Server: dorbs/0.2\r\n\r\n", // CHANGED: Name and version
+                              "Server: dorbs/0.2\r\n\r\n",
                               content_type, file_to_serve->size);
 
     if (header_len > 0 && (size_t)header_len < sizeof(header)) {
@@ -527,7 +527,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // CHANGED: Updated server name and version in the startup banner
     printf("╔════════════════════════════════════════════════════════╗\n");
     printf("║                     dorbs v0.2 (◕‿◕✿)                  ║\n");
     printf("╠════════════════════════════════════════════════════════╣\n");

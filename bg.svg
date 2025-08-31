@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Base blur for soft bubbles -->
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="60" />
+    </filter>
+
+    <!-- Extra-soft blur for background glows -->
+    <filter id="glowBlur">
+      <feGaussianBlur stdDeviation="120" />
+    </filter>
+
+    <!-- Gentle film grain (very subtle) -->
+    <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="11"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.025"/>
+      </feComponentTransfer>
+    </filter>
+
+    <!-- A radial vignette to keep edges soft -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+      <stop offset="60%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.15"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background base color (main: #f5deb3) -->
+  <rect width="100%" height="100%" fill="#0c0b50ff"/>
+
+  <!-- Large, very soft background glows -->
+  <g filter="url(#glowBlur)" opacity="0.45">
+    <circle cx="300" cy="220" r="280" fill="#f9e7c7"/>
+    <circle cx="1400" cy="180" r="360" fill="#efd9b4"/>
+    <circle cx="1200" cy="720" r="300" fill="#ff6b26ff"/>
+    <circle cx="180" cy="760" r="260" fill="#ffe7c6"/>
+  </g>
+
+  <!-- Mid-layer soft bubbles -->
+  <g filter="url(#softBlur)" opacity="0.6">
+    <circle cx="260" cy="320" r="140" fill="#f3d9b3"/>
+    <circle cx="520" cy="200" r="110" fill="#f7dfbd"/>
+    <circle cx="860" cy="320" r="160" fill="#f53900ff"/>
+    <circle cx="1180" cy="420" r="140" fill="#ff592fff"/>
+    <circle cx="1020" cy="620" r="130" fill="#f8e4c6"/>
+    <circle cx="640" cy="640" r="150" fill="#efcda2"/>
+    <circle cx="380" cy="620" r="120" fill="#f4dcbb"/>
+  </g>
+
+  <!-- Foreground, slightly crisper bubbles (no blur) -->
+  <g opacity="0.25">
+    <circle cx="520" cy="460" r="80" fill="#fff4e2"/>
+    <circle cx="980" cy="280" r="70" fill="#fdebd2"/>
+    <circle cx="760" cy="520" r="90" fill="#ffe6c9"/>
+    <circle cx="1280" cy="560" r="75" fill="#f8e1c3"/>
+    <circle cx="320" cy="200" r="60" fill="#ffeeda"/>
+  </g>
+
+  <!-- Subtle vignette overlay to keep edges calm -->
+  <rect width="100%" height="100%" fill="url(#vignette)"/>
+
+  <!-- Very light grain overlay on top -->
+  <rect width="100%" height="100%" filter="url(#grain)" opacity="0.25"/>
+</svg>
