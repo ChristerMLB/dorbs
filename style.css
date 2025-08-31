@@ -20,16 +20,17 @@ body {
     margin: 0;
 }
 .container {
-    background:wheat;
+    background:#f5deb3;
     margin: 5rem auto 0 auto;
-    padding: 2rem 3rem;
+    padding: 2rem 4rem;
     border: 2px dotted navy;
+    border-radius: 5em;
     box-shadow: 0 4px 24px rgba(255,255,255,0.4);
     text-align: center;
 }
 #threedee{
-    width: 600px;
-    height: 400px;
+    width: 320px;
+    height: 300px;
     margin: 0 auto;
 }
 h1 {
@@ -51,4 +52,20 @@ a {
 }
 a:hover {
     color: #0ea5e9;
+}
+@media (max-width: 1080px){
+    .container{
+        margin: 1rem auto 0 auto;
+        padding: 1rem;
+        border-radius: 0;
+    }
+    .wide_decor{
+        display: none;
+    }
+    h1{
+        font-size: 1.2rem;
+    }
+    p{
+        font-size: 1rem;
+    }
 }
