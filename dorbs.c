@@ -313,7 +313,7 @@ void handle_client(ClientRequest *request) {
     }
 
     if (is_rate_limited(&request->client_addr)) {
-        send_error(request->client_socket, 429, "Too Many Requests");
+        send_error(request->client_socket, 429, "Too Many Requests (╭ರ_•́)(•–•;)");
         return;
     }
 
@@ -327,12 +327,12 @@ void handle_client(ClientRequest *request) {
 
     char method[16], path[MAX_PATH_LENGTH + 1], protocol[16];
     if (sscanf(buffer, "%15s %255s %15s", method, path, protocol) != 3) {
-        send_error(request->client_socket, 400, "Bad Request");
+        send_error(request->client_socket, 400, "Bad Request (╭ರ_•́)(•–•;)");
         return;
     }
 
     if (strcmp(method, "GET") != 0) {
-        send_error(request->client_socket, 405, "Method Not Allowed");
+        send_error(request->client_socket, 405, "Method Not Allowed (╭ರ_•́)(•–•;)");
         return;
     }
 
@@ -344,7 +344,7 @@ void handle_client(ClientRequest *request) {
     }
 
     if (!is_valid_path(final_path)) {
-        send_error(request->client_socket, 404, "Not Found");
+        send_error(request->client_socket, 404, "Not Found ¯\_(ツ)_/¯");
         return;
     }
 
@@ -364,7 +364,7 @@ void handle_client(ClientRequest *request) {
     pthread_rwlock_unlock(&cache_rwlock);
 
     if (!file_to_serve) {
-        send_error(request->client_socket, 404, "Not Found");
+        send_error(request->client_socket, 404, "Not Found ¯\_(ツ)_/¯");
         return;
     }
     
@@ -405,7 +405,7 @@ void handle_client(ClientRequest *request) {
     }
 
     char msg[512];
-    snprintf(msg, sizeof(msg), "200 OK - Served %s to %s", file_to_serve->name, client_ip);
+    snprintf(msg, sizeof(msg), "200 OK ｡◕‿◕｡ - Served %s to %s", file_to_serve->name, client_ip);
     log_message("INFO", msg);
 
     close(request->client_socket);
@@ -473,7 +473,7 @@ void free_rate_limit_table() {
 int main(int argc, char *argv[]) {
     int port = (argc > 1) ? atoi(argv[1]) : DEFAULT_PORT;
     if (port <= 0 || port > 65535) {
-        fprintf(stderr, "Invalid port number.\n");
+        fprintf(stderr, "Invalid port number (•ิ_•)\n");
         return EXIT_FAILURE;
     }
 
@@ -481,11 +481,11 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, shutdown_server);
     signal(SIGPIPE, SIG_IGN);
 
-    log_message("INFO", "Starting dorbs server...");
+    log_message("INFO", "Starting dorbs, looking for files to serve...");
     
     cache_all_files();
     if (cache_count == 0) {
-        log_message("ERROR", "No allowed files found to serve. Server needs at least one file to start.");
+        log_message("ERROR", "dorbs couldn't find any files it wants to serve, shutting down ಠ_ಠ");
         return EXIT_FAILURE;
     }
 
@@ -495,7 +495,7 @@ int main(int argc, char *argv[]) {
 
     int server_fd = socket(AF_INET6, SOCK_STREAM, 0);
     if (server_fd < 0) {
-        log_error("Socket creation failed");
+        log_error("Socket creation failed, shutting down (ノಠ益ಠ)ノ彡┻━┻");
         return EXIT_FAILURE;
     }
 
@@ -508,20 +508,20 @@ int main(int argc, char *argv[]) {
     address.sin6_port = htons(port);
 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        log_error("Bind failed");
+        log_error("Bind failed, shutting down dorbs ノ┬─┬ノ ︵ ( \o°o)\\");
         close(server_fd);
         return EXIT_FAILURE;
     }
 
     if (listen(server_fd, SOMAXCONN) < 0) {
-        log_error("Listen failed");
+        log_error("Failed to listen, shutting down dorbs (╯-_-)╯ ~╩╩)");
         close(server_fd);
         return EXIT_FAILURE;
     }
 
     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
         if (pthread_create(&thread_pool[i], NULL, thread_worker, NULL) != 0) {
-            log_error("Thread creation failed");
+            log_error("thread creation failed, shutting down dorbs (╯°□°）╯︵ ┻━┻");
             server_running = 0;
             break;
         }
@@ -540,7 +540,7 @@ int main(int argc, char *argv[]) {
         request.client_socket = accept(server_fd, (struct sockaddr *)&request.client_addr, &addr_len);
         
         if (request.client_socket < 0) {
-            if (server_running) log_error("Accept failed");
+            if (server_running) log_error("Accept failed (•–•;)");
             continue;
         }
 
@@ -573,7 +573,7 @@ int main(int argc, char *argv[]) {
     close(server_fd);
     free_cache_data();
     free_rate_limit_table();
-    log_message("INFO", "Server shutdown complete");
+    log_message("INFO", "dorbs shutdown successful ┬──┬ ノ( ゜-゜ノ) ");
     
     return 0;
 }
