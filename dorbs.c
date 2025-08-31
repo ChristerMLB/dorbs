@@ -225,7 +225,7 @@ int is_allowed_file(const char *filename) {
 void cache_all_files() {
     DIR *dir = opendir(".");
     if (!dir) {
-        log_error("Cannot open current directory");
+        log_error("Cannot open current directory (ノ￣皿￣）ノ ⌒=== ┫");
         return;
     }
 
@@ -239,7 +239,7 @@ void cache_all_files() {
         if (file_info.st_size > MAX_FILE_SIZE || file_info.st_size == 0) continue;
 
         if (total_cache_memory + file_info.st_size > MAX_TOTAL_CACHE_MEMORY) {
-            log_message("WARN", "Total cache memory limit reached, cannot cache more files.");
+            log_message("WARN", "Total cache memory limit reached, cannot cache more files. (¤_¤)");
             break;
         }
 
@@ -249,7 +249,7 @@ void cache_all_files() {
         char *file_data = malloc(file_info.st_size);
         if (!file_data) {
             fclose(file);
-            log_message("CRITICAL", "Memory allocation failed for file cache. Exiting.");
+            log_message("CRITICAL", "Memory allocation failed for file cache. Shutting down dorbs (⓿_⓿)");
             exit(EXIT_FAILURE);
         }
 
@@ -344,7 +344,7 @@ void handle_client(ClientRequest *request) {
     }
 
     if (!is_valid_path(final_path)) {
-        send_error(request->client_socket, 404, "Not Found ¯\_(ツ)_/¯");
+        send_error(request->client_socket, 404, "Not Found ¯\\_(ツ)\\_/¯");
         return;
     }
 
@@ -364,7 +364,7 @@ void handle_client(ClientRequest *request) {
     pthread_rwlock_unlock(&cache_rwlock);
 
     if (!file_to_serve) {
-        send_error(request->client_socket, 404, "Not Found ¯\_(ツ)_/¯");
+        send_error(request->client_socket, 404, "Not Found ¯\\_(ツ)\\_/¯");
         return;
     }
     
@@ -405,7 +405,7 @@ void handle_client(ClientRequest *request) {
     }
 
     char msg[512];
-    snprintf(msg, sizeof(msg), "200 OK ｡◕‿◕｡ - Served %s to %s", file_to_serve->name, client_ip);
+    snprintf(msg, sizeof(msg), "200 OK ◕‿◕ - Served %s to %s", file_to_serve->name, client_ip);
     log_message("INFO", msg);
 
     close(request->client_socket);
@@ -508,7 +508,7 @@ int main(int argc, char *argv[]) {
     address.sin6_port = htons(port);
 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        log_error("Bind failed, shutting down dorbs ノ┬─┬ノ ︵ ( \o°o)\\");
+        log_error("Bind failed, shutting down dorbs ノ┬─┬ノ ︵ ( \\o°o)\\");
         close(server_fd);
         return EXIT_FAILURE;
     }
@@ -573,7 +573,7 @@ int main(int argc, char *argv[]) {
     close(server_fd);
     free_cache_data();
     free_rate_limit_table();
-    log_message("INFO", "dorbs shutdown successful ┬──┬ ノ( ゜-゜ノ) ");
+    log_message("INFO", "dorbs shut down successfully (◡‿◡✿)");
     
     return 0;
 }
