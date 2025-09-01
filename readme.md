@@ -1,4 +1,4 @@
-![image](icon.webp)
+<img src="icon.webp" alt="dorbs icon" width="300" height="auto">
 
 # dorbs
 
