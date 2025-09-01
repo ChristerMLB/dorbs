@@ -11,7 +11,7 @@ So, you know, don't use it  ¯\\\_(ツ)\_/¯
 
 ## What's in the repo?
 
-The executable ("dorbs") is all you need, use it (you really shouldn't!) by writing ./dorbs, or ./dorbs [port number] – the port number defaults to 9001
+The executable ("dorbs") is all you need, use it (you really shouldn't) by writing ./dorbs, or ./dorbs [port number] – the port number defaults to 9001
 
 "dorbs.c" contains the source code, "Makefile" is the makefile and the rest is just an example for seeing if the server is running and serving files properly.
 
