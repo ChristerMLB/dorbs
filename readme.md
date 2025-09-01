@@ -1,6 +1,4 @@
-<img src="icon.webp" alt="dorbs icon" width="300" height="auto">
-
-# dorbs
+# <img src="icon.webp" alt="dorbs icon" width="45" height="auto"> dorbs
 
 **dorbs** (short for "adorable server") is a tiny web server with strict limitations added for for potential security and performance:
 
