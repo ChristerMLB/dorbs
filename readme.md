@@ -1,3 +1,5 @@
+![image](icon.webp)
+
 # dorbs
 
 **dorbs** (short for "adorable server") is a tiny web server with strict limitations added for for potential security and performance:
